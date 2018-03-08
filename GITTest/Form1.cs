@@ -149,12 +149,56 @@ namespace GITTest
             foreach(string date in DatesFormatted)
             {
                 splitDates(date);
-            }
-            
-             
-            
-            
-           
+            }                    
         }
+
+        private int GetDateId(string date)
+        {
+
+            //Split the date down and assign it to variables for later use.
+            string[] arrayDate = date.Split('/');
+            int year = Convert.ToInt32(arrayDate[2]);
+            int month = Convert.ToInt32(arrayDate[1]);
+            int day = Convert.ToInt32(arrayDate[0]);
+
+            DateTime dateTime = new DateTime(year, month, day);
+
+            string dbDate = dateTime.ToString("M/dd/yyyy");
+
+
+            //Create a connection to the MDF file
+            string connectionStringDestination = Properties.Settings.Default.DestinationDatabaseConnectionString;
+
+            using (SqlConnection myConnection = new SqlConnection(connectionStringDestination))
+            {
+
+                // Open the SqlConnection.
+                myConnection.Open();
+                // The following code uses an SqlCommand based on the SqlConnection.
+                SqlCommand command = new SqlCommand("SELECT id FROM Time WHERE date = @date", myConnection);
+                command.Parameters.Add(new SqlParameter("date", dbDate));
+
+                //Create a variable and assign it to false by default.
+                bool exists = false;
+
+                //Run the command & read the results
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    //If there are rows, it means the date exsists so change the exsists variable. 
+                    if (reader.HasRows)
+                    {
+                        exists = true;
+                        Console.WriteLine("Data exsists!");
+                    }
+                }
+
+                if (exists == false)
+                {
+                    
+                }
+            }
+            return 0;
+        }
+
     }
 }
